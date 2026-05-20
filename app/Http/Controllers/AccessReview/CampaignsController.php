@@ -45,12 +45,10 @@ class CampaignsController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $campaign = AccessReviewCampaign::create([
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'status' => AccessReviewCampaign::STATUS_DRAFT,
-            'created_by' => auth()->id(),
-        ]);
+        $campaign = new AccessReviewCampaign($data);
+        $campaign->status = AccessReviewCampaign::STATUS_DRAFT;
+        $campaign->created_by = auth()->id();
+        $campaign->save();
 
         return redirect()
             ->route('access-review.campaigns.index')
@@ -120,15 +118,26 @@ class CampaignsController extends Controller
         }
 
         $count = DB::transaction(function () use ($campaign) {
-            $count = SnapshotCampaignItemsAction::run($campaign);
+            $locked = AccessReviewCampaign::lockForUpdate()->find($campaign->id);
 
-            $campaign->update([
-                'status' => AccessReviewCampaign::STATUS_ACTIVE,
-                'launched_at' => now(),
-            ]);
+            if (! $locked || ! $locked->isDraft()) {
+                return null;
+            }
 
-            return $count;
+            $items = SnapshotCampaignItemsAction::run($locked);
+
+            $locked->status = AccessReviewCampaign::STATUS_ACTIVE;
+            $locked->launched_at = now();
+            $locked->save();
+
+            return $items;
         });
+
+        if ($count === null) {
+            return redirect()
+                ->route('access-review.campaigns.index')
+                ->with('error', trans('admin/access-review/general.not_launchable_unless_draft'));
+        }
 
         return redirect()
             ->route('access-review.campaigns.index')
@@ -145,10 +154,25 @@ class CampaignsController extends Controller
                 ->with('error', trans('admin/access-review/general.not_closable_unless_active'));
         }
 
-        $campaign->update([
-            'status' => AccessReviewCampaign::STATUS_CLOSED,
-            'closed_at' => now(),
-        ]);
+        $closed = DB::transaction(function () use ($campaign) {
+            $locked = AccessReviewCampaign::lockForUpdate()->find($campaign->id);
+
+            if (! $locked || ! $locked->isActive()) {
+                return false;
+            }
+
+            $locked->status = AccessReviewCampaign::STATUS_CLOSED;
+            $locked->closed_at = now();
+            $locked->save();
+
+            return true;
+        });
+
+        if (! $closed) {
+            return redirect()
+                ->route('access-review.campaigns.index')
+                ->with('error', trans('admin/access-review/general.not_closable_unless_active'));
+        }
 
         return redirect()
             ->route('access-review.campaigns.index')

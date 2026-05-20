@@ -22,18 +22,8 @@ class AccessReviewItem extends SnipeModel
     protected $table = 'access_review_items';
 
     protected $fillable = [
-        'campaign_id',
-        'user_id',
-        'manager_id',
-        'license_id',
-        'license_seat_id',
-        'license_name_snapshot',
-        'cost_per_seat_snapshot',
         'manager_status',
         'manager_comment',
-        'manager_completed_at',
-        'admin_executed_at',
-        'admin_executed_by',
     ];
 
     protected $casts = [

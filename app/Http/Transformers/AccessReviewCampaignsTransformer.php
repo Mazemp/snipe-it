@@ -63,8 +63,8 @@ class AccessReviewCampaignsTransformer
             $editUrl = route('access-review.campaigns.edit', $campaign);
             $launchUrl = route('access-review.campaigns.launch', $campaign);
             $destroyUrl = route('access-review.campaigns.destroy', $campaign);
-            $launchConfirm = e(trans('admin/access-review/general.launch_confirm'));
-            $deleteConfirm = e(trans('general.delete_confirm', ['item' => $campaign->name]));
+            $launchConfirm = e(json_encode(trans('admin/access-review/general.launch_confirm')));
+            $deleteConfirm = e(json_encode(trans('general.delete_confirm', ['item' => $campaign->name])));
 
             $html .= '<a href="'.$editUrl.'" class="btn btn-sm btn-warning hidden-print" data-tooltip="true" title="'.e(trans('general.edit')).'">'
                 .'<i class="fa-solid fa-pen-to-square fa-fw" aria-hidden="true"></i>'
@@ -73,7 +73,7 @@ class AccessReviewCampaignsTransformer
             $html .= '<form method="POST" action="'.$launchUrl.'" style="display:inline">'
                 .'<input type="hidden" name="_token" value="'.$csrf.'">'
                 .'<button type="submit" class="btn btn-sm btn-primary hidden-print" data-tooltip="true" title="'.e(trans('admin/access-review/general.launch')).'" '
-                .'onclick="return confirm(\''.$launchConfirm.'\')">'
+                .'onclick="return confirm('.$launchConfirm.')">'
                 .'<i class="fa-solid fa-rocket fa-fw" aria-hidden="true"></i>'
                 .'<span class="sr-only">'.e(trans('admin/access-review/general.launch')).'</span></button></form>&nbsp;';
 
@@ -81,17 +81,17 @@ class AccessReviewCampaignsTransformer
                 .'<input type="hidden" name="_token" value="'.$csrf.'">'
                 .'<input type="hidden" name="_method" value="DELETE">'
                 .'<button type="submit" class="btn btn-sm btn-danger hidden-print" data-tooltip="true" title="'.e(trans('general.delete')).'" '
-                .'onclick="return confirm(\''.$deleteConfirm.'\')">'
+                .'onclick="return confirm('.$deleteConfirm.')">'
                 .'<i class="fa-solid fa-trash fa-fw" aria-hidden="true"></i>'
                 .'<span class="sr-only">'.e(trans('general.delete')).'</span></button></form>';
         } elseif ($campaign->isActive()) {
             $closeUrl = route('access-review.campaigns.close', $campaign);
-            $closeConfirm = e(trans('admin/access-review/general.close_confirm'));
+            $closeConfirm = e(json_encode(trans('admin/access-review/general.close_confirm')));
 
             $html .= '<form method="POST" action="'.$closeUrl.'" style="display:inline">'
                 .'<input type="hidden" name="_token" value="'.$csrf.'">'
                 .'<button type="submit" class="btn btn-sm btn-warning hidden-print" data-tooltip="true" title="'.e(trans('admin/access-review/general.close')).'" '
-                .'onclick="return confirm(\''.$closeConfirm.'\')">'
+                .'onclick="return confirm('.$closeConfirm.')">'
                 .'<i class="fa-solid fa-lock fa-fw" aria-hidden="true"></i>'
                 .'<span class="sr-only">'.e(trans('admin/access-review/general.close')).'</span></button></form>';
         }

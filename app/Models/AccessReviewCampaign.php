@@ -26,14 +26,9 @@ class AccessReviewCampaign extends SnipeModel
     protected $fillable = [
         'name',
         'description',
-        'status',
-        'launched_at',
-        'closed_at',
-        'created_by',
     ];
 
     protected $casts = [
-        'deleted_at' => 'datetime',
         'launched_at' => 'datetime',
         'closed_at' => 'datetime',
         'created_by' => 'integer',
