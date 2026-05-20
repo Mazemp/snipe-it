@@ -108,6 +108,18 @@ Route::group(['middleware' => 'auth'], function () {
     * Departments
     */
     Route::resource('departments', DepartmentsController::class);
+
+    /*
+    * Access Review
+    */
+    Route::group(['prefix' => 'access-review', 'as' => 'access-review.'], function () {
+        Route::post('campaigns/{campaign}/launch', [App\Http\Controllers\AccessReview\CampaignsController::class, 'launch'])
+            ->name('campaigns.launch');
+        Route::post('campaigns/{campaign}/close', [App\Http\Controllers\AccessReview\CampaignsController::class, 'close'])
+            ->name('campaigns.close');
+        Route::resource('campaigns', App\Http\Controllers\AccessReview\CampaignsController::class)
+            ->except(['show']);
+    });
 });
 
 /*

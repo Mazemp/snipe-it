@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use App\Presenters\AccessReviewCampaignPresenter;
+use App\Presenters\Presentable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class AccessReviewCampaign extends Model
+class AccessReviewCampaign extends SnipeModel
 {
     use HasFactory;
+    use Presentable;
+
+    protected $presenter = AccessReviewCampaignPresenter::class;
 
     public const STATUS_DRAFT = 'draft';
     public const STATUS_ACTIVE = 'active';

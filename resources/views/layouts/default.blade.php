@@ -1902,6 +1902,15 @@
                             </li>
                         @endcan
 
+                        @can('admin')
+                            <li{!! (request()->is('access-review*') ? ' class="active"' : '') !!}>
+                                <a href="{{ route('access-review.campaigns.index') }}">
+                                    <i class="fa-solid fa-clipboard-check fa-fw" aria-hidden="true"></i>
+                                    <span>{{ trans('admin/access-review/general.title') }}</span>
+                                </a>
+                            </li>
+                        @endcan
+
                         @can('viewRequestable', \App\Models\Asset::class)
                             <li{!! (request()->is('account/requestable-assets') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('requestable-assets') }}">
