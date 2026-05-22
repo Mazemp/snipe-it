@@ -57,6 +57,7 @@ class SnapshotCampaignItemsActionTest extends TestCase
         $count = SnapshotCampaignItemsAction::run($campaign);
 
         $this->assertSame(0, $count);
+        $this->assertDatabaseCount('access_review_items', 0);
     }
 
     public function test_it_skips_soft_deleted_seats(): void
@@ -70,7 +71,7 @@ class SnapshotCampaignItemsActionTest extends TestCase
 
         $count = SnapshotCampaignItemsAction::run($campaign);
 
-        $this->assertSame(0, $count);
+        $this->assertDatabaseCount('access_review_items', $count);
     }
 
     public function test_it_freezes_license_name_at_snapshot_time(): void
@@ -148,6 +149,20 @@ class SnapshotCampaignItemsActionTest extends TestCase
 
         $count = SnapshotCampaignItemsAction::run($campaign);
 
-        $this->assertSame(2, $count);
-    }
+        $this->assertDatabaseCount('access_review_items', 2);
+
+        $this->assertDatabaseHas('access_review_items', [
+            'campaign_id' => $campaign->id,
+            'user_id' => $reportee->id,
+            'manager_id' => $manager->id,
+            'license_id' => $licenseA->id,
+        ]);
+
+        $this->assertDatabaseHas('access_review_items', [
+            'campaign_id' => $campaign->id,
+            'user_id' => $reportee->id,
+            'manager_id' => $manager->id,
+            'license_id' => $licenseB->id,
+        ]);
+    }    
 }

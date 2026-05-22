@@ -50,9 +50,12 @@ final class SnapshotCampaignItemsAction
             })
             ->all();
 
-        foreach (array_chunk($rows, 500) as $chunk) {
-            AccessReviewItem::insert($chunk);
-        }
+        DB::transaction(function () use ($campaign, $rows) {
+            $campaign->items()->delete();
+            collect($rows)->chunk(500)->each(function ($chunk) {
+                AccessReviewItem::insert($chunk->all());
+            });
+        });
 
         return count($rows);
     }
