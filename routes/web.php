@@ -140,8 +140,12 @@ Route::group(['middleware' => 'auth'], function () {
                 ->push($campaign->name));
         Route::post('campaigns/{campaign}/items/{item}/execute', [App\Http\Controllers\AccessReview\CampaignsController::class, 'executeItem'])
             ->name('campaigns.items.execute');
-        Route::resource('campaigns', App\Http\Controllers\AccessReview\CampaignsController::class)
-            ->except(['show', 'index', 'create', 'edit']);
+        Route::post('campaigns', [App\Http\Controllers\AccessReview\CampaignsController::class, 'store'])
+            ->name('campaigns.store');
+        Route::match(['PUT', 'PATCH'], 'campaigns/{campaign}', [App\Http\Controllers\AccessReview\CampaignsController::class, 'update'])
+            ->name('campaigns.update');
+        Route::delete('campaigns/{campaign}', [App\Http\Controllers\AccessReview\CampaignsController::class, 'destroy'])
+            ->name('campaigns.destroy');
 
         Route::prefix('my-reviews')->name('my-reviews.')->group(function () {
             Route::get('/', [App\Http\Controllers\AccessReview\ManagerReviewController::class, 'index'])
