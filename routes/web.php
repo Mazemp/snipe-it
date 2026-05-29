@@ -118,16 +118,30 @@ Route::group(['middleware' => 'auth'], function () {
             ->name('campaigns.launch');
         Route::post('campaigns/{campaign}/close', [App\Http\Controllers\AccessReview\CampaignsController::class, 'close'])
             ->name('campaigns.close');
+        Route::get('campaigns', [App\Http\Controllers\AccessReview\CampaignsController::class, 'index'])
+            ->name('campaigns.index')
+            ->breadcrumbs(fn (Trail $trail) => $trail
+                ->parent('home')
+                ->push(trans('admin/access-review/general.campaigns')));
+        Route::get('campaigns/create', [App\Http\Controllers\AccessReview\CampaignsController::class, 'create'])
+            ->name('campaigns.create')
+            ->breadcrumbs(fn (Trail $trail) => $trail
+                ->parent('access-review.campaigns.index')
+                ->push(trans('admin/access-review/general.new_campaign')));
+        Route::get('campaigns/{campaign}/edit', [App\Http\Controllers\AccessReview\CampaignsController::class, 'edit'])
+            ->name('campaigns.edit')
+            ->breadcrumbs(fn (Trail $trail, AccessReviewCampaign $campaign) => $trail
+                ->parent('access-review.campaigns.index')
+                ->push($campaign->name));
         Route::get('campaigns/{campaign}/results', [App\Http\Controllers\AccessReview\CampaignsController::class, 'results'])
             ->name('campaigns.results')
             ->breadcrumbs(fn (Trail $trail, AccessReviewCampaign $campaign) => $trail
-                ->parent('home')
-                ->push(trans('admin/access-review/general.campaigns'), route('access-review.campaigns.index'))
+                ->parent('access-review.campaigns.index')
                 ->push($campaign->name));
         Route::post('campaigns/{campaign}/items/{item}/execute', [App\Http\Controllers\AccessReview\CampaignsController::class, 'executeItem'])
             ->name('campaigns.items.execute');
         Route::resource('campaigns', App\Http\Controllers\AccessReview\CampaignsController::class)
-            ->except(['show']);
+            ->except(['show', 'index', 'create', 'edit']);
 
         Route::prefix('my-reviews')->name('my-reviews.')->group(function () {
             Route::get('/', [App\Http\Controllers\AccessReview\ManagerReviewController::class, 'index'])
