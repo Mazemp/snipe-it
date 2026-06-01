@@ -44,6 +44,7 @@ return [
     'cost_per_seat'            => 'Cost / Seat',
     'decision'                 => 'Decision',
     'comment'                  => 'Comment',
+    'comment_required'         => 'A comment is required for Modify.',
     'keep'                     => 'Keep',
     'modify'                   => 'Modify',
     'remove'                   => 'Remove',

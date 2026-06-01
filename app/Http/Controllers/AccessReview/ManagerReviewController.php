@@ -70,9 +70,13 @@ class ManagerReviewController extends Controller
             return response()->json(['error' => trans('admin/access-review/general.review_already_completed')], 422);
         }
 
+        $isModify = $request->input('manager_status') === AccessReviewItem::STATUS_MODIFY;
+
         $validated = $request->validate([
             'manager_status'  => ['required', Rule::in(AccessReviewItem::VALID_STATUSES)],
-            'manager_comment' => ['nullable', 'string', 'max:1000'],
+            'manager_comment' => $isModify
+                ? ['required', 'string', 'max:1000']
+                : ['nullable', 'string', 'max:1000'],
         ]);
 
         $item->fill($validated)->save();

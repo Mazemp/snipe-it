@@ -146,6 +146,7 @@ $(function () {
         var itemId  = $row.data('item-id');
         var status  = $btn.data('status');
         var colors  = { keep: 'btn-success', modify: 'btn-warning', delete: 'btn-danger' };
+        var $ta     = $row.find('.review-comment');
 
         // Update button group appearance
         $row.find('.decision-btn')
@@ -153,9 +154,17 @@ $(function () {
             .addClass('btn-default');
         $btn.removeClass('btn-default').addClass('active ' + colors[status]);
 
+        // Modify requires a comment — focus the textarea and wait for input
+        if (status === 'modify' && $ta.val().trim() === '') {
+            $ta.addClass('has-error').focus();
+            $row.find('.save-indicator').html('<small class="text-warning">{{ trans('admin/access-review/general.comment_required') }}</small>');
+            return;
+        }
+
+        $ta.removeClass('has-error');
         states[itemId] = true;
         updateSubmitButton();
-        doSave(itemId, status, $row.find('.review-comment').val(), $row);
+        doSave(itemId, status, $ta.val(), $row);
     });
 
     $(document).on('input', '.review-comment:not([disabled])', function () {
@@ -166,9 +175,12 @@ $(function () {
         clearTimeout(timers[itemId]);
         timers[itemId] = setTimeout(function () {
             var status = $row.find('.decision-btn.active').data('status');
-            if (status) {
-                doSave(itemId, status, $ta.val(), $row);
-            }
+            if (!status) return;
+            // Don't save a modify decision until the comment is filled in
+            if (status === 'modify' && $ta.val().trim() === '') return;
+            $ta.removeClass('has-error');
+            $row.find('.save-indicator').html('');
+            doSave(itemId, status, $ta.val(), $row);
         }, 600);
     });
 

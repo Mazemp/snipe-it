@@ -129,6 +129,35 @@ class ManagerReviewTest extends TestCase
         ]);
     }
 
+    public function test_modify_decision_requires_a_comment(): void
+    {
+        $manager  = User::factory()->create();
+        $campaign = AccessReviewCampaign::factory()->active()->create();
+        $item     = AccessReviewItem::factory()->create(['campaign_id' => $campaign->id, 'manager_id' => $manager->id]);
+
+        $this->actingAs($manager)
+            ->patch(route('access-review.my-reviews.items.save', [$campaign, $item]), [
+                'manager_status'  => AccessReviewItem::STATUS_MODIFY,
+                'manager_comment' => '',
+            ])
+            ->assertSessionHasErrors('manager_comment');
+    }
+
+    public function test_modify_decision_with_comment_is_accepted(): void
+    {
+        $manager  = User::factory()->create();
+        $campaign = AccessReviewCampaign::factory()->active()->create();
+        $item     = AccessReviewItem::factory()->create(['campaign_id' => $campaign->id, 'manager_id' => $manager->id]);
+
+        $this->actingAs($manager)
+            ->patch(route('access-review.my-reviews.items.save', [$campaign, $item]), [
+                'manager_status'  => AccessReviewItem::STATUS_MODIFY,
+                'manager_comment' => 'Needs access level change.',
+            ])
+            ->assertOk()
+            ->assertJson(['success' => true]);
+    }
+
     public function test_manager_cannot_save_decision_for_another_managers_item(): void
     {
         $manager      = User::factory()->create();
