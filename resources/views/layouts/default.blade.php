@@ -1902,21 +1902,29 @@
                             </li>
                         @endcan
 
-                        @can('admin')
-                            <li{!! (request()->is('access-review*') ? ' class="active"' : '') !!}>
-                                <a href="{{ route('access-review.campaigns.index') }}">
-                                    <i class="fa-solid fa-clipboard-check fa-fw" aria-hidden="true"></i>
-                                    <span>{{ trans('admin/access-review/general.title') }}</span>
-                                </a>
-                            </li>
-                        @else
-                            <li{!! (request()->is('access-review/my-reviews*') ? ' class="active"' : '') !!}>
-                                <a href="{{ route('access-review.my-reviews.index') }}">
-                                    <i class="fa-solid fa-clipboard-check fa-fw" aria-hidden="true"></i>
-                                    <span>{{ trans('admin/access-review/general.my_reviews') }}</span>
-                                </a>
-                            </li>
-                        @endcan
+                        <li class="treeview{{ (request()->is('access-review*') ? ' active' : '') }}">
+                            <a href="#">
+                                <i class="fa-solid fa-clipboard-check fa-fw" aria-hidden="true"></i>
+                                <span>{{ trans('admin/access-review/general.title') }}</span>
+                                <x-icon type="angle-left" class="pull-right fa-fw"/>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li{!! (request()->is('access-review/my-reviews*') ? ' class="active"' : '') !!}>
+                                    <a href="{{ route('access-review.my-reviews.index') }}">
+                                        <x-icon type="circle" class="fa-fw"/>
+                                        {{ trans('admin/access-review/general.my_reviews') }}
+                                    </a>
+                                </li>
+                                @can('admin')
+                                    <li{!! (request()->is('access-review/campaigns*') ? ' class="active"' : '') !!}>
+                                        <a href="{{ route('access-review.campaigns.index') }}">
+                                            <x-icon type="circle" class="fa-fw"/>
+                                            {{ trans('admin/access-review/general.campaigns') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </li>
 
                         @can('viewRequestable', \App\Models\Asset::class)
                             <li{!! (request()->is('account/requestable-assets') ? ' class="active"' : '') !!}>

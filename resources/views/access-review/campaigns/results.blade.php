@@ -96,17 +96,26 @@
                         @if($tabItems->isEmpty())
                             <p class="text-muted" style="margin:8px 0 0;">{{ trans('admin/access-review/general.no_items') }}</p>
                         @else
-                            <table class="table table-striped table-condensed" style="margin-bottom:0;">
+                            <div id="tab-{{ $tab }}-toolbar" class="hidden-print"></div>
+                            <table
+                                class="table table-striped snipe-table"
+                                id="tab-{{ $tab }}-table"
+                                data-cookie-id-table="accessReviewResults{{ ucfirst($tab) }}"
+                                data-id-table="accessReviewResults{{ ucfirst($tab) }}"
+                                data-toolbar="#tab-{{ $tab }}-toolbar"
+                                data-pagination="false"
+                                data-show-refresh="false"
+                                style="margin-bottom:0;">
                                 <thead>
                                     <tr>
-                                        <th>{{ trans('admin/access-review/general.user') }}</th>
-                                        <th>{{ trans('admin/access-review/general.manager') }}</th>
-                                        <th>{{ trans('admin/access-review/general.license') }}</th>
-                                        <th>{{ trans('admin/access-review/general.cost_per_seat') }}</th>
-                                        <th>{{ trans('admin/access-review/general.decision') }}</th>
-                                        <th>{{ trans('admin/access-review/general.comment') }}</th>
-                                        <th>{{ trans('admin/access-review/general.executed') }}</th>
-                                        <th></th>
+                                        <th data-field="user" data-sortable="true">{{ trans('admin/access-review/general.user') }}</th>
+                                        <th data-field="manager" data-sortable="true">{{ trans('admin/access-review/general.manager') }}</th>
+                                        <th data-field="license" data-sortable="true">{{ trans('admin/access-review/general.license') }}</th>
+                                        <th data-field="cost_per_seat" data-sortable="true" data-sorter="costSorter">{{ trans('admin/access-review/general.cost_per_seat') }}</th>
+                                        <th data-field="decision" data-escape="false">{{ trans('admin/access-review/general.decision') }}</th>
+                                        <th data-field="comment">{{ trans('admin/access-review/general.comment') }}</th>
+                                        <th data-field="executed" data-escape="false">{{ trans('admin/access-review/general.executed') }}</th>
+                                        <th data-field="actions" data-escape="false" data-sortable="false" data-switchable="false"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,21 +157,27 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($visibleStatus && ! $item->isExecuted())
-                                                    @php
-                                                        $confirmMsg = match($visibleStatus) {
-                                                            'delete' => trans('admin/access-review/general.execute_delete_confirm'),
-                                                            'modify' => trans('admin/access-review/general.execute_modify_confirm'),
-                                                            default  => trans('admin/access-review/general.execute_keep_confirm'),
-                                                        };
-                                                    @endphp
-                                                    <button type="button"
-                                                            class="btn btn-xs btn-{{ $decisionClass }} execute-btn"
-                                                            data-execute-url="{{ route('access-review.campaigns.items.execute', [$campaign, $item]) }}"
-                                                            data-confirm="{{ $confirmMsg }}"
-                                                            data-item-id="{{ $item->id }}">
-                                                        {{ trans('admin/access-review/general.execute') }}
-                                                    </button>
+                                                @if($visibleStatus && ! $item->isExecuted() && $visibleStatus !== 'keep')
+                                                    @if($visibleStatus === 'modify')
+                                                        <a href="{{ route('licenses.edit', $item->license_id) }}"
+                                                           class="btn btn-xs btn-{{ $decisionClass }}">
+                                                            {{ trans('admin/access-review/general.execute') }}
+                                                        </a>
+                                                    @else
+                                                        @php
+                                                            $confirmMsg = match($visibleStatus) {
+                                                                'delete' => trans('admin/access-review/general.execute_delete_confirm'),
+                                                                default  => trans('admin/access-review/general.execute_keep_confirm'),
+                                                            };
+                                                        @endphp
+                                                        <button type="button"
+                                                                class="btn btn-xs btn-{{ $decisionClass }} execute-btn"
+                                                                data-execute-url="{{ route('access-review.campaigns.items.execute', [$campaign, $item]) }}"
+                                                                data-confirm="{{ $confirmMsg }}"
+                                                                data-item-id="{{ $item->id }}">
+                                                            {{ trans('admin/access-review/general.execute') }}
+                                                        </button>
+                                                    @endif
                                                 @endif
                                             </td>
                                         </tr>
@@ -179,6 +194,7 @@
 @stop
 
 @section('moar_scripts')
+@include('partials.bootstrap-table')
 <script>
 $(function () {
     var csrfToken = '{{ csrf_token() }}';

@@ -14,7 +14,14 @@
 
 @section('content')
     <x-container>
-        <x-box>
+        <x-box name="accessReviewCampaigns">
+            <x-slot:bulkactions>
+                <x-table.bulk-actions
+                    action_route="{{ route('access-review.campaigns.bulk-destroy') }}"
+                    model_name="access_review_campaign">
+                    <option value="delete">{{ trans('general.delete') }}</option>
+                </x-table.bulk-actions>
+            </x-slot:bulkactions>
             <x-table
                     show_column_search="false"
                     fixed_right_number="1"

@@ -43,15 +43,23 @@
             </div>
 
             {{-- Review table --}}
-            <table class="table table-striped" id="review-table">
+            <div id="my-review-toolbar" class="hidden-print"></div>
+            <table class="table table-striped snipe-table" id="review-table"
+                data-cookie-id-table="accessReviewMyReview{{ $campaign->id }}"
+                data-id-table="accessReviewMyReview{{ $campaign->id }}"
+                data-toolbar="#my-review-toolbar"
+                data-pagination="false"
+                data-show-refresh="false"
+                data-row-attributes="getReviewRowAttrs">
                 <thead>
                     <tr>
-                        <th>{{ trans('admin/access-review/general.user') }}</th>
-                        <th>{{ trans('admin/access-review/general.license') }}</th>
-                        <th>{{ trans('admin/access-review/general.cost_per_seat') }}</th>
-                        <th>{{ trans('admin/access-review/general.decision') }}</th>
-                        <th>{{ trans('admin/access-review/general.comment') }}</th>
-                        <th style="width:32px;"></th>
+                        <th data-field="user" data-sortable="true">{{ trans('admin/access-review/general.user') }}</th>
+                        <th data-field="license" data-sortable="true">{{ trans('admin/access-review/general.license') }}</th>
+                        <th data-field="cost_per_seat" data-sortable="true" data-sorter="costSorter">{{ trans('admin/access-review/general.cost_per_seat') }}</th>
+                        <th data-field="decision" data-escape="false" data-sortable="false">{{ trans('admin/access-review/general.decision') }}</th>
+                        <th data-field="comment" data-escape="false" data-sortable="false">{{ trans('admin/access-review/general.comment') }}</th>
+                        <th data-field="save_indicator" data-escape="false" data-sortable="false" data-switchable="false" style="width:32px;"></th>
+                        <th data-field="_meta" data-visible="false" data-switchable="false"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,6 +104,11 @@
                                     <i class="fa fa-check text-success"></i>
                                 @endif
                             </td>
+                            <td>{{ json_encode([
+                                'data-item-id' => (string) $item->id,
+                                'data-save-url' => route('access-review.my-reviews.items.save', [$campaign, $item]),
+                                'data-reviewed' => $item->manager_status ? '1' : '0',
+                            ]) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -134,6 +147,12 @@
 @stop
 
 @section('moar_scripts')
+<script>
+function getReviewRowAttrs(row) {
+    try { return JSON.parse(row._meta); } catch (e) { return {}; }
+}
+</script>
+@include('partials.bootstrap-table')
 <script>
 $(function () {
     var csrfToken = '{{ csrf_token() }}';

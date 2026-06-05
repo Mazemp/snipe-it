@@ -95,6 +95,32 @@ class CampaignsController extends Controller
             ->with('success', trans('admin/access-review/general.updated'));
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $this->authorize('admin');
+
+        $ids    = (array) $request->input('ids', []);
+        $action = $request->input('bulk_actions');
+
+        if ($action !== 'delete' || empty($ids)) {
+            return redirect()->route('access-review.campaigns.index')
+                ->with('error', trans('general.no_results_found'));
+        }
+
+        AccessReviewCampaign::whereIn('id', $ids)->each(function (AccessReviewCampaign $campaign) {
+            if ($campaign->isDraft()) {
+                DB::transaction(function () use ($campaign) {
+                    $campaign->items()->delete();
+                    $campaign->delete();
+                });
+            }
+        });
+
+        return redirect()
+            ->route('access-review.campaigns.index')
+            ->with('success', trans('admin/access-review/general.deleted'));
+    }
+
     public function destroy(AccessReviewCampaign $campaign): RedirectResponse
     {
         $this->authorize('admin');
