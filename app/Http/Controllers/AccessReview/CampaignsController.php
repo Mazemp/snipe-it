@@ -58,7 +58,8 @@ class CampaignsController extends Controller
 
         return redirect()
             ->route('access-review.campaigns.index')
-            ->with('success', trans('admin/access-review/general.created'));
+            ->with('success', trans('admin/access-review/general.created'))
+            ->with('created_id', $campaign->id);
     }
 
     public function edit(AccessReviewCampaign $campaign): View|RedirectResponse

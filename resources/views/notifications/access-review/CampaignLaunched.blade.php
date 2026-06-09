@@ -6,7 +6,7 @@
     'count'    => $itemCount,
 ]) }}
 
-@component('mail::button', ['url' => url(route('access-review.my-reviews.show', $campaign))])
+@component('mail::button', ['url' => url(route('access-review.my-reviews.index'))])
 {{ trans('admin/access-review/general.email_launched_cta') }}
 @endcomponent
 

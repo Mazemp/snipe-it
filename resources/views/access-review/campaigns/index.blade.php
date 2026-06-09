@@ -37,4 +37,26 @@
 
 @section('moar_scripts')
     @include ('partials.bootstrap-table')
+    @if(session('created_id'))
+    <script>
+    $(function () {
+        var $table = $('[data-id-table="accessReviewCampaigns"]');
+        var createdId = {{ (int) session('created_id') }};
+
+        // Highlight the newly created row after the table renders
+        $table.on('post-body.bs.table', function () {
+            $table.find('tbody tr').each(function () {
+                if ($(this).find('a[href*="/' + createdId + '/"], form[action*="/' + createdId + '/"]').length) {
+                    $(this).addClass('warning');
+                    return false;
+                }
+            });
+        });
+
+        // Reset search and page so the new campaign is visible at the top
+        $table.bootstrapTable('resetSearch', '');
+        $table.bootstrapTable('refresh', { pageNumber: 1 });
+    });
+    </script>
+    @endif
 @stop

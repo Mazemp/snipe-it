@@ -213,8 +213,13 @@ $(function () {
         timers[itemId] = setTimeout(function () {
             var status = $row.find('.decision-btn.active').data('status');
             if (!status) return;
-            // Don't save a modify decision until the comment is filled in
-            if (status === 'modify' && $ta.val().trim() === '') return;
+            if (status === 'modify' && $ta.val().trim() === '') {
+                $ta.closest('.comment-group').addClass('has-error');
+                $row.find('.comment-error').show();
+                states[itemId] = false;
+                updateSubmitButton();
+                return;
+            }
             $ta.closest('.comment-group').removeClass('has-error');
             $row.find('.comment-error').hide();
             states[itemId] = true;
@@ -238,6 +243,15 @@ $(function () {
 
     function updateSubmitButton() {
         var allDone = Object.keys(states).every(function (k) { return states[k]; });
+        if (allDone) {
+            $('#review-table tbody tr').each(function () {
+                if ($(this).find('.decision-btn.active[data-status="modify"]').length &&
+                    $(this).find('.review-comment').val().trim() === '') {
+                    allDone = false;
+                    return false;
+                }
+            });
+        }
         $('#mark-complete-btn').prop('disabled', !allDone);
         $('#mark-complete-btn').siblings('small').toggle(!allDone);
     }

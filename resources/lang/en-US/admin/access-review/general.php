@@ -51,6 +51,7 @@ return [
     'progress'                 => 'Progression of access review',
     'no_active_reviews'        => 'You have no active reviews.',
     'campaign_not_active'      => 'This campaign is no longer active.',
+    'no_items_for_manager'     => 'You have no items to review for this campaign.',
     'mark_complete'            => 'Submit My Review',
     'mark_complete_confirm'    => 'Submit your review as complete? You will not be able to change your decisions after this.',
     'review_complete'          => 'Your review has been submitted.',
