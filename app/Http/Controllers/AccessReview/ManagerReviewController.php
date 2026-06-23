@@ -50,9 +50,7 @@ class ManagerReviewController extends Controller
             ->get();
 
         if ($items->isEmpty()) {
-            return redirect()
-                ->route('access-review.my-reviews.index')
-                ->with('error', trans('admin/access-review/general.no_items_for_manager'));
+            abort(403);
         }
 
         return view('access-review.my-reviews.show', compact('campaign', 'items'));
